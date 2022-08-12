@@ -24,19 +24,23 @@ def get_delta(current, previous, kind='relative'):
 	else: return current-previous
 
 def indicator_delta(current, previous, kind_delta='relative', prefix='', suffix=''):
-	if current > previous:
+	suffix_delta = '%'
+	delta = current-previous
+	if kind_delta == 'relative': delta = (current/previous - 1) * 100
+	else: suffix_delta = ''
+	if delta > 0:
 		return html.P([
 				html.Span('{}{:.2f}{} '.format(prefix, current, suffix)),
-				html.Span('▲ {:.2f}'.format(current-previous), style={'color': 'green'})
+				html.Span('▲ {:.2f}{}'.format(delta, suffix_delta), style={'color': 'green'})
 			])
-	elif current < previous:
+	elif delta < 0:
 		return html.P([
 			html.Span('{}{:.2f}{} '.format(prefix, current, suffix)),
-			html.Span('▼ {:.2f}'.format(current-previous), style={'color': 'red'})
+			html.Span('▼ {:.2f}{}'.format(delta, suffix_delta), style={'color': 'red'})
 			])
 	else:
 		return html.P([
-			html.Span('{}{:.2f}{} = 0'.format(prefix, current, suffix)),
+			html.Span('{}{:.2f}{} = 0{}'.format(prefix, current, suffix, suffix_delta)),
 			])
 
 def treasury_indicator(treasury_dict):
@@ -45,7 +49,7 @@ def treasury_indicator(treasury_dict):
 		children.append(
 			html.Div(children=[
 				html.P('20{}'.format(year)),
-				indicator_delta(treasury_dict[year].iloc[-1]['Taxa Compra Manhã'] * 100, treasury_dict[year].iloc[-2]['Taxa Compra Manhã'] * 100, suffix='%'),
+				indicator_delta(treasury_dict[year].iloc[-1]['Taxa Compra Manhã'] * 100, treasury_dict[year].iloc[-2]['Taxa Compra Manhã'] * 100, kind_delta='absolute', suffix='%'),
 				indicator_delta(treasury_dict[year].iloc[-1]['PU Compra Manhã'], treasury_dict[year].iloc[-2]['PU Compra Manhã'], prefix='R$'),
 			], className='column treasury'),
 		)
