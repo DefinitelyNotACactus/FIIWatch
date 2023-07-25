@@ -1,4 +1,4 @@
-from dash import Dash, dcc, html, Input, Output, State, no_update, callback_context
+from dash import Dash, dcc, html, Input, Output, State, no_update, callback_context, register_page
 
 import pandas as pd
 import numpy as np
@@ -14,6 +14,8 @@ from app import app
 from util import get_delta, indicator_delta
 
 split_date = lambda x : [int(s) for s in x.split('-')]
+
+#dash.register_page(__name__)
 
 def treasury_indicator(kind, treasury_dict):
 	children = []
@@ -55,7 +57,7 @@ layout = html.Div(children=[
 	html.Header(children=[
 			html.H1('FII Watch'),
 			html.Button('Tesouro', className='basic-button selected'),
-			dcc.Link('FIIs', href='pages/fii_dashboard', className='basic-button')
+			dcc.Link('FIIs', href='fii_dashboard', className='basic-button')
 		]),
 	html.Div(children=[
 			html.Div(children=[
