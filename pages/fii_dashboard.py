@@ -1,7 +1,9 @@
-from dash import Dash, dcc, html, Input, Output, State, no_update, callback_context
+from dash import Dash, dcc, html, Input, Output, State, no_update, callback_context, register_page
 
 import pandas as pd
 import numpy as np
+import requests
+import json
 
 import plotly.express as px
 import plotly.graph_objects as go
@@ -31,17 +33,29 @@ def init_regressor(ticker, df):
 yield_df = pd.read_csv('data/yield.csv', index_col=0) 
 regr = {ticker: init_regressor(ticker, yield_df) for ticker in yield_df['Ticker'].unique()}
 
-
 split_date = lambda x : [int(s) for s in x.split('-')]
 
-def treasury_indicator(treasury_dict):
+#dash.register_page(__name__)
+
+def yield_indicator(df):
 	children = []
-	for year in treasury_dict.keys():
+	for ticker in df.sort_values(by=['IPCA', 'CDI'], ascending=False)['Ticker'].unique():
+		response = requests.get(f'https://brapi.dev/api/quote/{ticker}?range=1d&interval=1d&fundamental=false&dividends=false')
+		result = json.loads(response.text)
+		price = result['results'][0]['regularMarketPrice']
+		previousClose = result['results'][0]['regularMarketPreviousClose']
+
+		prefix = 'CDI+'
+		if df.loc[df['Ticker'] == ticker, 'CDI'].isna().any(): prefix = 'IPCA+'
+
+		spread = regr[ticker].predict(np.array(price).reshape(-1, 1))[0]
 		children.append(
 			html.Div(children=[
-				html.P('20{}'.format(year)),
-				indicator_delta(treasury_dict[year].iloc[-1]['Taxa Compra Manhã'] * 100, treasury_dict[year].iloc[-2]['Taxa Compra Manhã'] * 100, kind_delta='absolute', suffix='%'),
-				indicator_delta(treasury_dict[year].iloc[-1]['PU Compra Manhã'], treasury_dict[year].iloc[-2]['PU Compra Manhã'], prefix='R$'),
+				html.P(ticker),
+				html.P([
+					html.Span('{} {:.2f}%'.format(prefix, spread)),
+				]),
+				indicator_delta(price, previousClose, prefix='R$'),
 			], className='column treasury'),
 		)
 	return html.Div(children=children, className='row')
@@ -60,15 +74,15 @@ def plot_tree_map(data):
 layout = html.Div(children=[
 	html.Header(children=[
 			html.H1('FII Watch'),
-			dcc.Link('Tesouro', href='pages/treasury_dashbord', className='basic-button'),
+			dcc.Link('Tesouro', href='treasury_dashbord', className='basic-button'),
 			html.Button('FIIs', className='basic-button selected')		
 		]),
 	html.Div(children=[
 			html.Div(children=[
 				html.Div(id='ref-data', style={'display': 'none'}),
 				html.H4('Kinea'),
-				html.P('Data referência: {}'.format(tr.LFT_LAST_UPDATE)),
-				treasury_indicator(tr.LFT_DICT),
+				html.P('Data referência: {}'.format(yield_df['Ref'].values[0])),
+				yield_indicator(yield_df),
 			], className='column', id='treasury-div'),
 		], className='main-div'),
 		#dcc.Graph(id="scatter", config={"displayModeBar": False}, figure=plot_tree_map(ifix))
