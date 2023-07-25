@@ -11,12 +11,12 @@ def indicator_delta(current, previous, kind_delta='relative', prefix='', suffix=
 	else: suffix_delta = ''
 	if delta > 0:
 		return html.P([
-				html.Span('{}{:.2f}{} '.format(prefix, current, suffix)),
+				html.Span('{}{:.2f}{}'.format(prefix, current, suffix)),
 				html.Span('▲ {:.2f}{}'.format(delta, suffix_delta), style={'color': 'green'})
 			])
 	elif delta < 0:
 		return html.P([
-			html.Span('{}{:.2f}{} '.format(prefix, current, suffix)),
+			html.Span('{}{:.2f}{}'.format(prefix, current, suffix)),
 			html.Span('▼ {:.2f}{}'.format(delta, suffix_delta), style={'color': 'red'})
 			])
 	else:
