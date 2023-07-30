@@ -8,54 +8,32 @@ import json
 import plotly.express as px
 import plotly.graph_objects as go
 
-from sklearn.linear_model import LinearRegression
-
 from datetime import datetime as dt
-
-import treasury as tr
 
 from app import app
 from util import get_delta, indicator_delta
 
-def init_regressor(ticker, df):
-	regr = LinearRegression()
-	if df.loc[df['Ticker'] == ticker, 'CDI'].isna().any():
-		regr.fit(df.loc[df['Ticker'] == ticker, 'Valor'].values.reshape(-1, 1), 
-        	df.loc[df['Ticker'] == ticker, 'IPCA'].values)
-	else:
-		regr.fit(df.loc[df['Ticker'] == ticker, 'Valor'].values.reshape(-1, 1), 
-        	df.loc[df['Ticker'] == ticker, 'CDI'].values)
-
-	return regr
-
-#fii_table = pd.read_csv('tabela_fiis.csv', index_col=0)
-#ifix = fii_table[fii_table['IFIX - Participação Percentual'] > 0]
-yield_df = pd.read_csv('data/yield.csv', index_col=0) 
-regr = {ticker: init_regressor(ticker, yield_df) for ticker in yield_df['Ticker'].unique()}
-
-split_date = lambda x : [int(s) for s in x.split('-')]
+import fii
 
 #dash.register_page(__name__)
 
 def yield_indicator(df):
 	children = []
 	for ticker in df.sort_values(by=['IPCA', 'CDI'], ascending=False)['Ticker'].unique():
-		response = requests.get(f'https://brapi.dev/api/quote/{ticker}?range=1d&interval=1d&fundamental=false&dividends=false')
-		result = json.loads(response.text)
-		price = result['results'][0]['regularMarketPrice']
-		previousClose = result['results'][0]['regularMarketPreviousClose']
+		price = fii.market_price(ticker)
+		previous = fii.market_previous(ticker)
 
 		prefix = 'CDI+'
 		if df.loc[df['Ticker'] == ticker, 'CDI'].isna().any(): prefix = 'IPCA+'
 
-		spread = regr[ticker].predict(np.array(price).reshape(-1, 1))[0]
+		spread = fii.YIELD_REGR[ticker].predict(np.array(price).reshape(-1, 1))[0]
 		children.append(
 			html.Div(children=[
 				html.P(ticker),
 				html.P([
 					html.Span('{} {:.2f}%'.format(prefix, spread)),
 				]),
-				indicator_delta(price, previousClose, prefix='R$'),
+				indicator_delta(price, previous, prefix='R$'),
 			], className='column treasury'),
 		)
 	return html.Div(children=children, className='row')
@@ -74,15 +52,15 @@ def plot_tree_map(data):
 layout = html.Div(children=[
 	html.Header(children=[
 			html.H1('FII Watch'),
-			dcc.Link('Tesouro', href='treasury_dashbord', className='basic-button'),
+			dcc.Link('Tesouro', href='/pages/treasury_dashbord', className='basic-button'),
 			html.Button('FIIs', className='basic-button selected')		
 		]),
 	html.Div(children=[
 			html.Div(children=[
 				html.Div(id='ref-data', style={'display': 'none'}),
 				html.H4('Kinea'),
-				html.P('Data referência: {}'.format(yield_df['Ref'].values[0])),
-				yield_indicator(yield_df),
+				html.P('Data referência: {}'.format(fii.YIELD['Ref'].values[0])),
+				yield_indicator(fii.YIELD),
 			], className='column', id='treasury-div'),
 		], className='main-div'),
 		#dcc.Graph(id="scatter", config={"displayModeBar": False}, figure=plot_tree_map(ifix))
