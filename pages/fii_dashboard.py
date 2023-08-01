@@ -52,8 +52,11 @@ def plot_tree_map(data):
 layout = html.Div(children=[
 	html.Header(children=[
 			html.H1('FII Watch'),
-			dcc.Link('Tesouro', href='/pages/treasury_dashbord', className='basic-button'),
-			html.Button('FIIs', className='basic-button selected')		
+			html.Div(children=[
+				dcc.Link('Tesouro', href='/pages/treasury_dashbord', className='basic-button'),
+				html.Button('FIIs', className='basic-button selected'),
+				dcc.Link('Info', href='/pages/info_dashboard', className='basic-button'),
+			], style={'height': '100%'}),
 		]),
 	html.Div(children=[
 			html.Div(children=[
