@@ -54,8 +54,11 @@ def plot_yield_curve(ntnf, previous=14):
 layout = html.Div(children=[
 	html.Header(children=[
 			html.H1('FII Watch'),
-			html.Button('Tesouro', className='basic-button selected'),
-			dcc.Link('FIIs', href='/pages/fii_dashboard', className='basic-button')
+			html.Div(children=[
+				html.Button('Tesouro', className='basic-button selected'),
+				dcc.Link('FIIs', href='/pages/fii_dashboard', className='basic-button'),
+				dcc.Link('Info', href='/pages/info_dashboard', className='basic-button'),
+			], style={'height': '100%'}),		
 		]),
 	html.Div(children=[
 			html.Div(children=[
