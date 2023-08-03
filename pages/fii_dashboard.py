@@ -10,12 +10,16 @@ import plotly.graph_objects as go
 
 from datetime import datetime as dt
 
-from app import app
 from util import get_delta, indicator_delta
 
 import fii
 
-#dash.register_page(__name__)
+register_page(
+    __name__,
+    title="FII Watch | FIIs & FIAgros",
+    description="Informações sobre FIIs & FIAgros",
+    path="/pages/fii_dashboard",
+)
 
 def yield_indicator(df):
 	children = []
@@ -53,9 +57,9 @@ layout = html.Div(children=[
 	html.Header(children=[
 			html.H1('FII Watch'),
 			html.Div(children=[
-				dcc.Link('Tesouro', href='/pages/treasury_dashbord', className='basic-button'),
+				dcc.Link('Tesouro', href='/pages/treasury_dashboard', className='basic-button'),
 				html.Button('FIIs', className='basic-button selected'),
-				dcc.Link('Info', href='/pages/info_dashboard', className='basic-button'),
+				dcc.Link('Info', href='/pages/info_dashboard/KNIP11', className='basic-button'),
 			], style={'height': '100%'}),
 		]),
 	html.Div(children=[
