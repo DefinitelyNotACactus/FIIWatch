@@ -10,19 +10,33 @@ import plotly.graph_objects as go
 
 from datetime import datetime as dt
 
-from app import app
 from util import get_delta, indicator_delta, price_delta
 
 import fii
 
 #dash.register_page(__name__)
 
-def get_layout(symbol='KNIP11'):
+def title(symbol='KNIP11'):
+    return f"FII Watch | {symbol}"
+
+
+def description(symbol='KNIP11'):
+    return f"Informações sobre {symbol}"
+
+register_page(
+    __name__,
+    path_template="/pages/info_dashboard/<symbol>",
+    title=title,
+    description=description,
+    path="/pages/info_dashboard/KNIP11",
+)
+
+def layout(symbol='KNIP11', **other_unknown_query_strings):
 	return html.Div(children=[
 			html.Header(children=[
 					html.H1('FII Watch'),
 					html.Div(children=[
-						dcc.Link('Tesouro', href='/pages/treasury_dashbord', className='basic-button'),
+						dcc.Link('Tesouro', href='/pages/treasury_dashboard', className='basic-button'),
 						dcc.Link('FIIs', href='/pages/fii_dashboard', className='basic-button'),
 						html.Button('Info', className='basic-button selected'),
 					], style={'height': '100%'}),
@@ -42,7 +56,7 @@ def get_layout(symbol='KNIP11'):
 			html.Div(children=[
 				html.Div(children=[
 						html.H4('Segmento'),
-						html.H3('N/A', id='fund-class'),
+						html.H3(f"{fii.INFO.loc[fii.INFO['symbol'] == symbol, 'tipo'].values[0]} - {fii.INFO.loc[fii.INFO['symbol'] == symbol, 'subtipo'].values[0]}", id='fund-class'),
 					], className='info-div'),
 				html.Div(children=[
 						html.H4('DY 12M'),
@@ -50,7 +64,7 @@ def get_layout(symbol='KNIP11'):
 					], className='info-div'),
 				html.Div(children=[
 						html.H4('Último rendimento'),
-						html.H3('N/A', id='latest-dividend'),
+						html.H3(f"R$ {fii.INFO.loc[fii.INFO['symbol'] == symbol, 'rendimento'].values[0]: .2f}", id='latest-dividend'),
 					], className='info-div'),
 				html.Div(children=[
 						html.H4('Min. 52 Sem.'),
@@ -58,11 +72,11 @@ def get_layout(symbol='KNIP11'):
 					], className='info-div'),
 				html.Div(children=[
 						html.H4('Valor Patrimonial'),
-						html.H3('N/A', id='pv-value'),
+						html.H3(f"R$ {fii.INFO.loc[fii.INFO['symbol'] == symbol, 'patrimonio_cota'].values[0]: .2f}", id='pv-value'),
 					], className='info-div'),
 				html.Div(children=[
 						html.H4('P/VP'),
-						html.H3('N/A', id='pv-mv'),
+						html.H3(f"{fii.pvp(symbol): .2f}", id='pv-mv'),
 					], className='info-div'),
 				html.Div(children=[
 						html.H4('Retorno 12M'),

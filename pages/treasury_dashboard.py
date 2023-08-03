@@ -10,10 +10,14 @@ from datetime import datetime as dt
 
 import treasury as tr
 
-from app import app
 from util import get_delta, indicator_delta
 
-#dash.register_page(__name__)
+register_page(
+    __name__,
+    title="FII Watch | Tesouro Direto",
+    description="Informações sobre Títulos Públicos",
+    path="/pages/treasury_dashboard",
+)
 
 def treasury_indicator(kind, treasury_dict):
 	children = []
@@ -57,7 +61,7 @@ layout = html.Div(children=[
 			html.Div(children=[
 				html.Button('Tesouro', className='basic-button selected'),
 				dcc.Link('FIIs', href='/pages/fii_dashboard', className='basic-button'),
-				dcc.Link('Info', href='/pages/info_dashboard', className='basic-button'),
+				dcc.Link('Info', href='/pages/info_dashboard/KNIP11', className='basic-button'),
 			], style={'height': '100%'}),		
 		]),
 	html.Div(children=[
