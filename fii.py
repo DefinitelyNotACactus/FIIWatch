@@ -17,6 +17,7 @@ YIELD = pd.read_csv('data/yield.csv', index_col=0)
 YIELD_REGR = {ticker: init_regressor(ticker, YIELD) for ticker in YIELD['Ticker'].unique()}
 
 INFO = pd.read_csv('data/info.csv', index_col=0)
+SYMBOLS = INFO['symbol'].unique()
 
 market_price = lambda x : INFO.loc[INFO['symbol'] == x, 'regularMarketPrice'].values[0]
 market_previous = lambda x : INFO.loc[INFO['symbol'] == x, 'regularMarketPreviousClose'].values[0]
