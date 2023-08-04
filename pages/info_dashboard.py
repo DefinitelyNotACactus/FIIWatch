@@ -10,7 +10,7 @@ import plotly.graph_objects as go
 
 from datetime import datetime as dt
 
-from util import get_delta, indicator_delta, price_delta
+from util import get_delta, indicator_delta, price_delta, line_plot
 
 import fii
 
@@ -88,7 +88,19 @@ def layout(symbol='KNIP11', **other_unknown_query_strings):
 						html.H4('Retorno 1M'),
 						price_delta(fii.relative_delta_1mo(symbol), H3=True),
 					], className='info-div'),
-				], className='main-div info', id='basic-info'),
+				], className='main-div info', id='basic-info', style={'border-bottom': '0px', 'margin-bottom': '12px'}),
+			html.Div(children=[
+					html.Button('Cotação', className='basic-button selected'),
+					html.Button('Histórico VP', className='basic-button'),
+					html.Button('Número Cotistas', className='basic-button'),
+					html.Button('Rendimentos', className='basic-button'),
+					html.Button('Despesas', className='basic-button'),
+					html.Button('Receitas', className='basic-button'),
+					html.Button('Carteira', className='basic-button'),
+				], className='button-bar', id='chart-buttons-div'),
+			html.Div(children=[
+					dcc.Graph(id='chart1', figure=line_plot(fii.QUOTES.loc[fii.QUOTES['ticker'] == symbol, ['date', 'close']], 'date', 'close'), className='chart'),
+				], className='main-div info', id='chart-div'),
 			html.Footer(children=[
 					html.H4('Todas as informações apresentadas por este aplicativo possuem carater informativo e provêm de fontes públicas. O FII Watch não se responsabiliza pelas decisões e caminhos tomados pelo usuário a partir da análise das informações apresentadas.'),
 			]),])

@@ -70,7 +70,7 @@ header h1 {
     cursor: pointer;
 }
 
-.basic-button:hover, .selected {
+.basic-button:hover, .selected, .button-bar .selected {
     color: rgba(90, 243, 72, 1);
 }
 
@@ -88,6 +88,11 @@ header h1 {
     position: relative;
     margin-left: 2%;
     margin-right: 2%;
+}
+
+.chart {
+    min-height: 320px;
+    width: 100%;
 }
 
 .info {
@@ -170,4 +175,17 @@ header h1 {
     margin-top: 0px;
     margin-bottom: 12px;
     justify-content: center;
+}
+
+.button-bar {
+    display: block;
+    background-color: rgba(45, 53, 62, 1);
+    margin-left: 2%;
+    margin-right: 2%;
+    /*style={'display': 'block', 'background-color': 'rgba(5, 51, 26, 1)'}*/
+}
+
+.button-bar button {
+    color: rgba(255, 255, 255, 1);
+    font-size: 1.6rem;
 }
