@@ -14,8 +14,6 @@ from util import get_delta, indicator_delta, price_delta
 
 import fii
 
-#dash.register_page(__name__)
-
 def title(symbol='KNIP11'):
     return f"FII Watch | {symbol}"
 
@@ -60,15 +58,19 @@ def layout(symbol='KNIP11', **other_unknown_query_strings):
 					], className='info-div'),
 				html.Div(children=[
 						html.H4('DY 12M'),
-						html.H3('N/A', id='dy'),
+						html.H3(f"{fii.dy_12mo(symbol): .2f}%", id='dy'),
 					], className='info-div'),
 				html.Div(children=[
 						html.H4('Último rendimento'),
-						html.H3(f"R$ {fii.INFO.loc[fii.INFO['symbol'] == symbol, 'rendimento'].values[0]: .2f}", id='latest-dividend'),
+						html.H3(f"R$ {fii.latest_payment(symbol): .2f}", id='latest-dividend'),
 					], className='info-div'),
 				html.Div(children=[
 						html.H4('Min. 52 Sem.'),
 						html.H3(f"R$ {fii.INFO.loc[fii.INFO['symbol'] == symbol, 'fiftyTwoWeekLow'].values[0]: .2f}", id='min-52wk'),
+					], className='info-div'),
+				html.Div(children=[
+						html.H4('Max. 52 Sem.'),
+						html.H3(f"R$ {fii.INFO.loc[fii.INFO['symbol'] == symbol, 'fiftyTwoWeekHigh'].values[0]: .2f}", id='max-52wk'),
 					], className='info-div'),
 				html.Div(children=[
 						html.H4('Valor Patrimonial'),
@@ -80,11 +82,11 @@ def layout(symbol='KNIP11', **other_unknown_query_strings):
 					], className='info-div'),
 				html.Div(children=[
 						html.H4('Retorno 12M'),
-						html.H3('N/A', id='1y-return'),
+						price_delta(fii.relative_delta_12mo(symbol), H3=True),
 					], className='info-div'),
 				html.Div(children=[
 						html.H4('Retorno 1M'),
-						html.H3('N/A', id='1m-return'),
+						price_delta(fii.relative_delta_1mo(symbol), H3=True),
 					], className='info-div'),
 				], className='main-div info', id='basic-info'),
 			html.Footer(children=[
