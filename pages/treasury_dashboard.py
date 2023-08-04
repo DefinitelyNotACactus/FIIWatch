@@ -19,6 +19,13 @@ register_page(
     path="/pages/treasury_dashboard",
 )
 
+register_page(
+    __name__,
+    title="FII Watch | Tesouro Direto",
+    description="Informações sobre Títulos Públicos",
+    path="/",
+)
+
 def treasury_indicator(kind, treasury_dict):
 	children = []
 	for year in treasury_dict.keys():
