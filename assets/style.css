@@ -178,11 +178,11 @@ header h1 {
 }
 
 .button-bar {
+    border-radius: .5rem;
     display: block;
-    background-color: rgba(45, 53, 62, 1);
+    background-color: #777;
     margin-left: 2%;
     margin-right: 2%;
-    /*style={'display': 'block', 'background-color': 'rgba(5, 51, 26, 1)'}*/
 }
 
 .button-bar button {
