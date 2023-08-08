@@ -1,6 +1,7 @@
 import pandas as pd
 
 from sklearn.linear_model import LinearRegression
+from util import line_plot, pie_plot
 
 def init_regressor(ticker, df):
 	regr = LinearRegression()
@@ -20,6 +21,12 @@ QUOTES = QUOTES.dropna()
 QUOTES['date'] = pd.to_datetime(QUOTES['date'])
 QUOTES_12MO = QUOTES[(TODAY - QUOTES.date).dt.days <= 365]
 QUOTES_1MO = QUOTES[(TODAY - QUOTES.date).dt.days <= 30]
+
+plot_quotes = lambda x : line_plot(QUOTES.loc[QUOTES['ticker'] == x, ['date', 'close']], 'date', 'close', figure=False, annot=x)
+
+FUNDS = pd.read_csv('data/funds_portfolio.csv', index_col=0)
+
+plot_funds_portfolio = lambda x : pie_plot(FUNDS.loc[(FUNDS['Dono'] == x) & (FUNDS['Data Referência'] == '31/03/2023'), ['Fundo', 'Valor (R$)']], 'Fundo', 'Valor (R$)', figure=False)
 
 YIELD = pd.read_csv('data/yield.csv', index_col=0)
 YIELD_REGR = {ticker: init_regressor(ticker, YIELD) for ticker in YIELD['Ticker'].unique()}
