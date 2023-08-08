@@ -1,4 +1,4 @@
-from dash import html
+from dash import html, dcc
 
 import plotly.express as px
 import plotly.graph_objects as go
@@ -41,9 +41,20 @@ def price_delta(delta, H3=False):
 		if H3 is False: return html.P('= 0%'.format(delta))
 		else: return html.H3('= 0%'.format(delta))
 
-def line_plot(data, x, y):
+def get_annot_template(annot):
+	template = go.layout.Template()
+	template.layout.annotations = [
+	    dict(name="watermark", text=annot, opacity=0.1,
+	        font=dict(color="black", size=100), xref="paper", yref="paper",
+	        x=0.5, y=0.5, showarrow=False)
+	    ]
+
+	return template
+
+def line_plot(data, x, y, figure=True, annot=None):
 	# Create traces
 	fig = go.Figure()
+	if annot is not None: fig.update_layout(template=get_annot_template(annot))
 	fig.update_layout(margin=dict(l=16, r=16, t=16, b=16), 
 		xaxis=dict(showgrid=True, zeroline=False, gridcolor="rgb(80, 80, 80)", griddash='dash'), 
 		yaxis=dict(showgrid=True, zeroline=False, gridcolor="rgb(80, 80, 80)"), 
@@ -55,4 +66,29 @@ def line_plot(data, x, y):
 
 	fig.add_trace(go.Scatter(x=data[x], y=data[y], mode='lines'))
 
-	return fig
+	if figure is True: return fig
+	else: return dcc.Graph(figure=fig, className='chart')
+
+def pie_plot(data, label, value, figure=True, annot=None):
+	# Fake data
+	#labels = ['Oxygen','Hydrogen','Carbon_Dioxide','Nitrogen']
+	#values = [np.random.uniform(0, 1) for i in range(4)]
+
+	#fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
+	# Create traces
+	fig = go.Figure()
+	if annot is not None: fig.update_layout(template=get_annot_template(annot))
+	fig.update_layout(margin=dict(l=16, r=16, t=16, b=16), 
+		#xaxis=dict(showgrid=True, zeroline=False, gridcolor="rgb(80, 80, 80)", griddash='dash'), 
+		#yaxis=dict(showgrid=True, zeroline=False, gridcolor="rgb(80, 80, 80)"), 
+		plot_bgcolor="rgba(0, 0, 0, 0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        font_family="DIN Alternate",
+        #showlegend=False,
+        )
+
+	fig.add_trace(go.Pie(labels=data[label].values, values=data[value].values))
+	fig.update_traces(textposition='inside', textinfo='percent+label')
+
+	if figure is True: return fig
+	else: return dcc.Graph(figure=fig, className='chart')	
